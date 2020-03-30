@@ -1,0 +1,17 @@
+*.iml
+*.ipr
+*.iws
+.idea/
+bin/
+target/
+conf/
+.project
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+# Created by .ignore support plugin (hsz.mobi)
+notes.iml
