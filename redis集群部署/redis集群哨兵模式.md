@@ -12,6 +12,10 @@ redis-server --port 6381 --slaveof 192.168.0.167 6379
 ```
 ## 哨兵的工作方式：
 
+![Image text](img/1585571988.jpg)
+
+![Image text](img/1585572096.jpg)
+
 * 每个Sentinel（哨兵）进程以每秒钟一次的频率向整个集群中的Master主服务器，Slave从服务器以及其他Sentinel（哨兵）进程发送一个 PING 命令。
 * 如果一个实例（instance）距离最后一次有效回复 PING 命令的时间超过 down-after-milliseconds 选项所指定的值， 则这个实例会被 Sentinel（哨兵）进程标记为主观下线（SDOWN）
 * 如果一个Master主服务器被标记为主观下线（SDOWN），则正在监视这个Master主服务器的所有 Sentinel（哨兵）进程要以每秒一次的频率确认Master主服务器的确进入了主观下线状态
