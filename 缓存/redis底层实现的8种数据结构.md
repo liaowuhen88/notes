@@ -192,12 +192,18 @@ b.收缩时，ht[1]的大小为第一个大于等于ht[0].used的2的n次方（2
 ```
 /* ZSETs use a specialized version of Skiplists */
 typedef struct zskiplistNode {
-    robj *obj;  /*成员对象*/
-    double score;   /*分值*/
-    struct zskiplistNode *backward; /*后退指针*/
-    struct zskiplistLevel { /*层*/
-        struct zskiplistNode *forward;  /*前进指针*/
-        unsigned int span;  /*跨度*/
+    // 成员对象
+    robj *obj; 
+    //  分值
+    double score;  
+    // 后退指针
+    struct zskiplistNode *backward;
+    // 层
+    struct zskiplistLevel { 
+        // 前进指针
+        struct zskiplistNode *forward; 
+        // 跨度 
+        unsigned int span; 
     } level[];
 } zskiplistNode;
 
