@@ -32,7 +32,7 @@ SDS获取字符串长度时间复杂度为O(1)；c字符串为O(n)。
 * 字符串扩容安全
 SDS动态扩容，不会发生缓冲区溢出；c字符串执行strcat(s,"test");时，如果忘记给s分配足够的空间，会导致溢出。
 * 二进制安全（数据写入的格式和读取的格式一致）
-二、链表->双向链表
+# 二、链表->双向链表
 ## 2.1.数据结构
 ### 2.1.1 节点结构
 ```
@@ -74,6 +74,7 @@ int *(*match)(void *ptr,void *key);//节点值对比函数
 # 三、字典——哈希
 ## 3.1.数据结构
 ### 3.1.1. 哈希表
+```
 struct dictht{
 
 dictEntry **table;//哈希表数组
@@ -89,7 +90,9 @@ unsigned long sizemask;
 unsigned long used;//该哈希表已有节点数
 
 }dictht;
-3.1.2.哈希表节点
+```
+### 3.1.2.哈希表节点
+```
 struct dictEntry{
 
 void * key;//键
@@ -111,7 +114,9 @@ int64_t s64;
 struct dictEntry *next;
 
 }dictEntry;
-3.1.3. 字典
+```
+### 3.1.3. 字典
+```
 struct dict{
 
 dicType *type;//类型特定函数
@@ -127,26 +132,27 @@ dictht ht[2];//哈希表
 int rehashidx;
 
 }dict;
-3.2.哈希算法（Murmurhash算法）
+```
+## 3.2.哈希算法（Murmurhash算法）
 redis计算哈希值和索引值的方法如下：
 
 使用字典设置的哈希函数，计算键key的哈希值
 hash = dict->type->hashFunction(key);
 使用哈希表的sizemark属性和哈希值，计算出索引值，依据情况不同，ht[x]可以是ht[0]或者ht[1]
 index = hash & dict->ht[x].sizemask;（sizemask为size-1）。
-3.3.解决冲突
+## 3.3.解决冲突
 链地址法来解决冲突。
 
-3.4.rehash扩容／收缩
-3.4.1.rehash步骤
-为字典ht[1]分配空间。
+## 3.4.rehash扩容／收缩
+### 3.4.1.rehash步骤
+* 为字典ht[1]分配空间。
 空间分配：
 a.扩容时，ht[1]的大小为第一个大于等于ht[0].used*2的2的n次方。
 b.收缩时，ht[1]的大小为第一个大于等于ht[0].used的2的n次方（2为负值）。
 
-rehashidxs设置成0，将ht[0]的值往ht[1]复制。每个节点复制完成后置为NULL。
+* rehashidxs设置成0，将ht[0]的值往ht[1]复制。每个节点复制完成后置为NULL。
 
-迁移完成后，释放ht[0]，将ht[1]设置成ht[0]，并创建新的ht[1]。
+* 迁移完成后，释放ht[0]，将ht[1]设置成ht[0]，并创建新的ht[1]。
 
 注：rehash过程中，如果发生插入操作，则直接插入ht[1]；
 如果发生查找和更新操作，查ht[0]和ht[1]。
