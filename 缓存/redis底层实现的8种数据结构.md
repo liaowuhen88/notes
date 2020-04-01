@@ -195,8 +195,10 @@ typedef struct zskiplistNode {
 //对象 
 sds *obj;
 
-//分值 double score; 
-// 后退指针 struct zskiplistNode *backward; 
+//分值 
+double score; 
+// 后退指针 
+struct zskiplistNode *backward; 
 // 层 
 struct zskiplistLevel { 
 // 前进指针 
