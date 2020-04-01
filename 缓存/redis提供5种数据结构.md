@@ -2,6 +2,8 @@
 
 ![Image text](img/1585642134.jpg)
 
+![Image text](img/1585726587.jpg)
+
 对redis来说，所有的key（键）都是字符串。
 
 ## 1.String 字符串类型
