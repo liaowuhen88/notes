@@ -136,13 +136,12 @@ int rehashidx;
 ## 3.2.哈希算法（Murmurhash算法）
 redis计算哈希值和索引值的方法如下：
 
-使用字典设置的哈希函数，计算键key的哈希值
+* 使用字典设置的哈希函数，计算键key的哈希值
 hash = dict->type->hashFunction(key);
-使用哈希表的sizemark属性和哈希值，计算出索引值，依据情况不同，ht[x]可以是ht[0]或者ht[1]
+* 使用哈希表的sizemark属性和哈希值，计算出索引值，依据情况不同，ht[x]可以是ht[0]或者ht[1]
 index = hash & dict->ht[x].sizemask;（sizemask为size-1）。
 ## 3.3.解决冲突
 链地址法来解决冲突。
-
 ## 3.4.rehash扩容／收缩
 ### 3.4.1.rehash步骤
 * 为字典ht[1]分配空间。
@@ -153,18 +152,19 @@ b.收缩时，ht[1]的大小为第一个大于等于ht[0].used的2的n次方（2
 * rehashidxs设置成0，将ht[0]的值往ht[1]复制。每个节点复制完成后置为NULL。
 
 * 迁移完成后，释放ht[0]，将ht[1]设置成ht[0]，并创建新的ht[1]。
-
+```
 注：rehash过程中，如果发生插入操作，则直接插入ht[1]；
 如果发生查找和更新操作，查ht[0]和ht[1]。
-3.4.扩容的条件(为了节约内存)
-1）没有执行BGSAVE或者BGREWRITEAOF命令，并且哈希表负载因子大于等于1
+```
+## 3.4.扩容的条件(为了节约内存)
+* 没有执行BGSAVE或者BGREWRITEAOF命令，并且哈希表负载因子大于等于1
 
-2）执行BGSAVE或者BGREWRITEAOF命令，并且哈希表负载因子大于等于5
+* 执行BGSAVE或者BGREWRITEAOF命令，并且哈希表负载因子大于等于5
 
 负载因子 = ht[0].used / ht[0].size
 
-四、跳跃表
-4.1.算法
+# 四、跳跃表
+## 4.1.算法
 采用抛硬币的方式决定数字在第几层出现。
 
 跳表
