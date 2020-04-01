@@ -190,23 +190,17 @@ b.收缩时，ht[1]的大小为第一个大于等于ht[0].used的2的n次方（2
 ## 4.2.数据结构
 ### 4.2.1.跳跃表节点
 ```
-/** * ZSETs use a specialized version of Skiplists * 跳跃表中的数据节点 */ 
+/* ZSETs use a specialized version of Skiplists */
 typedef struct zskiplistNode {
-//对象 
-sds *obj;
-
-//分值 
-double score; 
-// 后退指针 
-struct zskiplistNode *backward; 
-// 层 
-struct zskiplistLevel { 
-// 前进指针 
-struct zskiplistNode *forward; 
-/** * 跨度实际上是用来计算元素排名(rank)的， * 在查找某个节点的过程中，将沿途访过的所有层的跨度累积起来， * 得到的结果就是目标节点在跳跃表中的排位 */ 
-unsigned long span; 
-} level[]; 
+    robj *obj;  /*成员对象*/
+    double score;   /*分值*/
+    struct zskiplistNode *backward; /*后退指针*/
+    struct zskiplistLevel { /*层*/
+        struct zskiplistNode *forward;  /*前进指针*/
+        unsigned int span;  /*跨度*/
+    } level[];
 } zskiplistNode;
+
 ```
 ### 4.2.2.跳跃表
 ```
