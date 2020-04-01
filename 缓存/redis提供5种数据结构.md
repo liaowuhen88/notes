@@ -118,7 +118,50 @@ OK
 
 1.缓存： 能直观，相比string更节省空间，的维护缓存信息，如用户信息，视频信息等。
 
- ## 3.链表 
+ ## 3.链表 ->双向链表
+ 
+ ### 3.1.数据结构
+ 
+ #### 3.1.1 节点结构
+ ```
+ struct listNode{
+ 
+ struct listNode *prev;
+ 
+ struct listNode *next;
+ 
+ void *value;
+ 
+ }listNode;
+ ```
+#### 3.1.2 数据结构
+```
+struct list{
+
+listNode *head;
+
+listNode *tail;
+
+unsigned long len;//链表长度
+
+void *(*dup)(void *ptr);//节点值复制函数
+
+void *(*free)(void *ptr);//节点值释放函数
+
+int *(*match)(void *ptr,void *key);//节点值对比函数
+
+}list;
+  ```
+  
+ ## 3.2.特性
+ 
+ * 双端
+ * 无环
+ * 带表头指针和表尾指针
+ * 有链表长度
+ * 多态
+ * 链表节点使用*void指针来保存节点值，可以通过list结构的dup、free、match三个属性为节点值设置类型特定函数，所以链表可以用于保存各种不同类型的值。
+ 
 List 说白了就是链表（redis 使用双端链表实现的 List），是有序的，value可以重复，可以通过下标取出对应的value值，左右两边都能进行插入和删除数据。
 
 ![Image text](img/1585645039.jpg)
