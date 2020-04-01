@@ -80,6 +80,69 @@ OK
 3.session：常见方案spring session + redis实现session共享，
 
 ## 2.Hash （哈希）
+
+### 2.1.数据结构
+#### 2.1.1. 哈希表
+```
+struct dictht{
+
+dictEntry **table;//哈希表数组
+
+unsigned long size;//哈希表大小
+
+//哈希表大小掩码，用于计算索引值
+
+//总是等于size-1
+
+unsigned long sizemask;
+
+unsigned long used;//该哈希表已有节点数
+
+}dictht;
+```
+
+#### 2.1.2.哈希表节点
+```
+struct dictEntry{
+
+void * key;//键
+
+//值
+
+union{
+
+void *val;
+
+uint64_t u64;
+
+int64_t s64;
+
+}v;
+
+//指向下一个哈希表节点，形成链表
+
+struct dictEntry *next;
+
+}dictEntry;
+```
+#### 2.1.3.字典
+```
+struct dict{
+
+dicType *type;//类型特定函数
+
+void *privdata;//私有数据
+
+dictht ht[2];//哈希表
+
+//rehash索引
+
+//当rehash不复制拷贝时，值为-1
+
+int rehashidx;
+
+}dict;
+```
 是一个Mapmap，指值本身又是一种键值对结构，如 value={{field1,value1},......fieldN,valueN}}
 
 ![Image text](img/1585644681.jpg)
