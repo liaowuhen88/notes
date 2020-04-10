@@ -38,8 +38,8 @@ JDK1.8.0_144，Java HotSpot(TM) 64-Bit Server VM，
 
 虚拟机运行在Client模式下的默认值，Serial+Serial Old。
 
-Copy=Serial
-MarkSweepCompact=Serial Old
+* Copy=Serial
+* MarkSweepCompact=Serial Old
 
 -XX:InitialHeapSize=65006144 -XX:MaxHeapSize=1040098304 -XX:+PrintCommandLineFlags -XX:+PrintGCDetails -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:-UseLargePagesIndividualAllocation -XX:+UseSerialGC 
 ```  
@@ -56,8 +56,12 @@ Heap
   class space    used 311K, capacity 386K, committed 512K, reserved 1048576K
 ```  
 ### 2、指定-XX:+UseParNewGC
+ParNew+Serial Old，在JDK1.8被废弃，在JDK1.7还可以使用。
 
 -XX:InitialHeapSize=65006144 -XX:MaxHeapSize=1040098304 -XX:+PrintCommandLineFlags -XX:+PrintGCDetails -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:-UseLargePagesIndividualAllocation -XX:+UseParNewGC 
+
+* ParNew=ParNew
+* MarkSweepCompact=Serial Old
 ```  
 ParNew
 MarkSweepCompact
@@ -75,7 +79,13 @@ Java HotSpot(TM) 64-Bit Server VM warning: Using the ParNew young collector with
 
 ### 3、指定-XX:+UseConcMarkSweepGC
 
+ParNew+CMS+Serial Old。
+
 -XX:InitialHeapSize=65006144 -XX:MaxHeapSize=1040098304 -XX:MaxNewSize=346030080 -XX:MaxTenuringThreshold=6 -XX:OldPLABSize=16 -XX:+PrintCommandLineFlags -XX:+PrintGCDetails -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:-UseLargePagesIndividualAllocation -XX:+UseParNewGC 
+
+* ParNew=ParNew
+
+* ConcurrentMarkSweep=CMS
 ```  
 ParNew
 ConcurrentMarkSweep
@@ -91,6 +101,11 @@ Heap
   
 ###  4、指定-XX:+UseParallelGC
 -XX:InitialHeapSize=65006144 -XX:MaxHeapSize=1040098304 -XX:+PrintCommandLineFlags -XX:+PrintGCDetails -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:-UseLargePagesIndividualAllocation -XX:+UseParallelGC 
+
+虚拟机运行在Server模式下的默认值，Parallel Scavenge+Serial Old(PS Mark Sweep)。
+
+* PS Scavenge = Parallel Scavenge
+* PS MarkSweep = Serial Old
 ```  
 PS Scavenge
 PS MarkSweep
@@ -104,3 +119,40 @@ Heap
  Metaspace       used 2863K, capacity 4486K, committed 4864K, reserved 1056768K
   class space    used 311K, capacity 386K, committed 512K, reserved 1048576K
 ```  
+
+### 5、指定-XX:+UseParallelOldGC
+Parallel Scavenge+Parallel Old。
+
+-XX:InitialHeapSize=65006144 -XX:MaxHeapSize=1040098304 -XX:+PrintCommandLineFlags -XX:+PrintGCDetails -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:-UseLargePagesIndividualAllocation -XX:+UseParallelOldGC 
+
+* PS Scaveng e= Parallel Scavenge
+* PS MarkSweep = Parallel Old
+
+```  
+PS Scavenge
+PS MarkSweep
+Heap
+ PSYoungGen      total 18432K, used 1588K [0x00000000eb580000, 0x00000000eca00000, 0x0000000100000000)
+  eden space 15872K, 10% used [0x00000000eb580000,0x00000000eb70d058,0x00000000ec500000)
+  from space 2560K, 0% used [0x00000000ec780000,0x00000000ec780000,0x00000000eca00000)
+  to   space 2560K, 0% used [0x00000000ec500000,0x00000000ec500000,0x00000000ec780000)
+ ParOldGen       total 42496K, used 0K [0x00000000c2000000, 0x00000000c4980000, 0x00000000eb580000)
+  object space 42496K, 0% used [0x00000000c2000000,0x00000000c2000000,0x00000000c4980000)
+ Metaspace       used 2863K, capacity 4486K, committed 4864K, reserved 1056768K
+  class space    used 311K, capacity 386K, committed 512K, reserved 1048576K
+  ```  
+  
+### 6、指定-XX:+UseG1GC
+
+-XX:InitialHeapSize=65006144 -XX:MaxHeapSize=1040098304 -XX:+PrintCommandLineFlags -XX:+PrintGCDetails -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseG1GC -XX:-UseLargePagesIndividualAllocation 
+
+
+```  
+G1 Young Generation
+G1 Old Generation
+Heap
+ garbage-first heap   total 63488K, used 1024K [0x00000000c2000000, 0x00000000c21001f0, 0x0000000100000000)
+  region size 1024K, 2 young (2048K), 0 survivors (0K)
+ Metaspace       used 2864K, capacity 4486K, committed 4864K, reserved 1056768K
+  class space    used 311K, capacity 386K, committed 512K, reserved 1048576K
+ ```  
