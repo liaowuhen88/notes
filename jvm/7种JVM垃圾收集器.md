@@ -94,4 +94,46 @@ Parallel Scavenge收集器除了会显而易见地提供可以精确控制吞吐
 
 [46张PPT弄懂JVM、GC算法和性能调优，这篇我必须推荐给你](https://mp.weixin.qq.com/s?__biz=MzI3ODcxMzQzMw==&mid=2247489332&idx=2&sn=65de5886e13b98116c8432d7d10ae4bc&chksm=eb539202dc241b14010f70edf89dc37c7629b5e2b7add50fd3f58070ecf2c14260196bf147d8&scene=21#wechat_redirect)  
 
+## 老年代收集器
 
+### Serial Old收集器
+
+Serial Old 是 Serial收集器的老年代版本，它同样是一个单线程收集器，使用“标记-整理”（Mark-Compact）算法。
+
+此收集器的主要意义也是在于给Client模式下的虚拟机使用。如果在Server模式下，它还有两大用途：
+
+* 在JDK1.5 以及之前版本（Parallel Old诞生以前）中与Parallel Scavenge收集器搭配使用。
+
+* 作为CMS收集器的后备预案，在并发收集发生Concurrent Mode Failure时使用。
+
+它的工作流程与Serial收集器相同，这里再次给出Serial/Serial Old配合使用的工作流程图：
+
+![Image text](img/1586485180.jpg)
+
+### Parallel Old收集器
+
+Parallel Old收集器是Parallel Scavenge收集器的老年代版本，使用多线程和“标记-整理”算法。
+
+前面已经提到过，这个收集器是在JDK 1.6中才开始提供的，在此之前，如果新生代选择了Parallel Scavenge收集器。
+
+老年代除了Serial Old以外别无选择，所以在Parallel Old诞生以后，“吞吐量优先”收集器终于有了比较名副其实的应用组合，在注重吞吐量以及CPU资源敏感的场合，都可以优先考虑Parallel Scavenge加Parallel Old收集器。
+
+Parallel Old收集器的工作流程与Parallel Scavenge相同，这里给出Parallel Scavenge/Parallel Old收集器配合使用的流程图：
+
+![Image text](img/1586486253.jpg)
+
+### CMS收集器
+
+CMS（Concurrent Mark Sweep）收集器是一种以获取最短回收停顿时间为目标的收集器，它非常符合那些集中在互联网站或者B/S系统的服务端上的Java应用，这些应用都非常重视服务的响应速度。从名字上（“Mark Sweep”）就可以看出它是基于“标记-清除”算法实现的。
+
+CMS收集器工作的整个流程分为以下4个步骤：
+
+* 初始标记（CMS initial mark）：仅仅只是标记一下GC Roots能直接关联到的对象，速度很快，需要“Stop The World”。
+* 并发标记（CMS concurrent mark）：进行GC Roots Tracing的过程，在整个过程中耗时最长。
+* 重新标记（CMS remark）：为了修正并发标记期间因用户程序继续运作而导致标记产生变动的那一部分对象的标记记录，这个阶段的停顿时间一般会比初始标记阶段稍长一些，但远比并发标记的时间短。此阶段也需要“Stop The World”。
+* 并发清除（CMS concurrent sweep）
+
+由于整个过程中耗时最长的并发标记和并发清除过程收集器线程都可以与用户线程一起工作。
+所以，从总体上来说，CMS收集器的内存回收过程是与用户线程一起并发执行的。通过下图可以比较清楚地看到CMS收集器的运作步骤中并发和需要停顿的时间：
+
+![Image text](img/1586486527.jpg)
