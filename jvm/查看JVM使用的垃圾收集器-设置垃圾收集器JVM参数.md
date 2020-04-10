@@ -156,3 +156,28 @@ Heap
  Metaspace       used 2864K, capacity 4486K, committed 4864K, reserved 1056768K
   class space    used 311K, capacity 386K, committed 512K, reserved 1048576K
  ```  
+ 
+ ## 五、总结：
+ 
+ * 1、-XX:+UseParallelGC和-XX:+UseParallelOldGC除了JVM参数不同，打印结果都一样，看解释是因为设置了名字相同的MXBean，其内部的实现是不同的。
+ 
+ * 2、Serial的MXBean名称为Copy，新生代池名称为def new generation。
+ 
+ * ParNew：ParNew、par new generation。
+ 
+ * Parallel Scavenge：PS Scavenge、PSYoungGen。
+ 
+ * Serial Old：MarkSweepCompact、tenured generation 。
+ 
+ * Serial Old(PS Mark Sweep)：PS MarkSweep、ParOldGen。
+ 
+ * Parallel Old：PS MarkSweep、ParOldGen。
+ 
+ * G1（不准确）：G1 Young Generation、garbage-first heap 
+ 
+        G1 Old Generation 、无。
+ 
+ 
+ ————————————————
+ 版权声明：本文为CSDN博主「抱抱-」的原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接及本声明。
+ 原文链接：https://blog.csdn.net/shi2huang/article/details/80085193
