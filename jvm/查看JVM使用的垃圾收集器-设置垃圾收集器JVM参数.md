@@ -102,7 +102,7 @@ Heap
 ###  4、指定-XX:+UseParallelGC
 -XX:InitialHeapSize=65006144 -XX:MaxHeapSize=1040098304 -XX:+PrintCommandLineFlags -XX:+PrintGCDetails -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:-UseLargePagesIndividualAllocation -XX:+UseParallelGC 
 
-虚拟机运行在Server模式下的默认值，Parallel Scavenge+Serial Old(PS Mark Sweep)。
+**虚拟机运行在Server模式下的默认值，Parallel Scavenge+Serial Old(PS Mark Sweep)。**
 
 * PS Scavenge = Parallel Scavenge
 * PS MarkSweep = Serial Old
