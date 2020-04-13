@@ -328,3 +328,109 @@ CMS(Concurrent Mark Sweep，并发标记清除) 收集器是以获取最短回�
 * 4）并发清除（CMS concurrent sweep）：
 
 ![Image text](img/1586772661.jpg)
+
+提问环节：为什么CMS要使用“标记-清除”算法呢？刚才我们不是提到过“标记-清除”算法，会留下很多内存碎片吗？
+确实，但是也没办法，如果换成“标记 - 整理”算法，把垃圾清理后，剩下的对象也顺便整理，会导致这些对象的内存地址发生变化，别忘了，此时其它线程还在工作，如果引用的对象地址变了，就天下大乱了。
+
+对于上述的问题JVM提供了两个参数：
+
+![Image text](img/1586772749.jpg)
+
+### 4.4 G1 - Garbage First
+
+JDK 9发布之日，G1宣告取代Parallel Scavenge加Parallel Old组合，成为服务端模式下的默认垃圾收集器。
+
+鉴于 CMS 的一些不足之外，比如: 老年代内存碎片化，STW 时间虽然已经改善了很多，但是仍然有提升空间。G1 就横空出世了，它对于堆区的内存划思路很新颖，有点算法中分治法“分而治之”的味道。具体什么意思呢，让我们继续看下去。
+
+G1 将连续的Java堆划分为多个大小相等的独立区域（Region），每一个Region都可以根据需要，扮演新生代的Eden空间、Survivor空间，或者老年代空间。每个Region的大小可以通过参数-XX：G1HeapRegionSize设定，取值范围为1MB～32MB，且应为2的N次幂。
+
+Region中还有一类特殊的Humongous区域，专门用来存储大对象。G1认为只要大小超过了一个Region容量一半的对象即可判定为大对象。对于那些超过了整个Region容量的超级大对象，将会被存放在N个连续的Humongous Region之中。
+
+Humongous，简称 H 区，是专用于存放超大对象的区域，通常 >= 1/2 Region Size，G1的大多数行为都把Humongous Region作为老年代的一部分来进行看待。
+
+![Image text](img/1586772853.jpg)
+
+认识了G1中的内存规划之后，我们就可以理解为什么它叫做"Garbage First"。
+
+所有的垃圾回收，都是基于 region 的。G1根据各个Region回收所获得的空间大小以及回收所需时间等指标在后台维护一个优先列表，每次根据允许的收集时间，优先回收价值最大（垃圾）的Region，
+
+从而可以有计划地避免在整个Java堆中进行全区域的垃圾收集。这也是 "Garbage First" 得名的由来。
+
+G1从整体来看是基于“标记-整理”算法实现的收集器，但从局部（两个Region之间）上看又是基于“标记-复制”算法实现，无论如何，这两种算法都意味着G1运作期间不会产生内存空间碎片，
+
+垃圾收集完成之后能提供规整的可用内存。这种特性有利于程序长时间运行，在程序为大对象分配内存时不容易因无法找到连续内存空间而提前触发下一次GC。
+
+一个对象和它内部所引用的对象可能不在同一个 Region 中，那么当垃圾回收时，是否需要扫描整个堆内存才能完整地进行一次可达性分析？
+
+这里就需要引入 Remembered Set 的概念了。
+
+答案是不需要，每个 Region 都有一个 Remembered Set （记忆集），用于记录本区域中所有对象引用的对象所在的区域，进行可达性分析时，只要在 GC Roots 中再加上 Remembered Set 即可防止对整个堆内存进行遍历。
+
+再提一个概念，Collection Set ：简称 CSet，记录了等待回收的 Region 集合，GC 时这些 Region 中的对象会被回收（copied or moved）。
+
+G1 运作步骤
+如果不计算维护 Remembered Set 的操作，G1 收集器的工作过程分为以下几个步骤：
+
+* 初始标记（Initial Marking）：Stop The World，仅使用一条初始标记线程对所有与 GC Roots 直接关联的对象进行标记。
+* 并发标记（Concurrent Marking）：使用一条标记线程与用户线程并发执行。此过程进行可达性分析，速度很慢。
+* 最终标记（Final Marking）：Stop The World，使用多条标记线程并发执行。
+* 筛选回收（Live Data Counting and Evacuation）：回收废弃对象，
+此时也要 Stop The World，并使用多条筛选回收线程并发执行。（还会更新Region的统计数据，对各个Region的回收价值和成本进行排序）
+
+![Image text](img/1586773033.jpg)
+
+从上述阶段的描述可以看出，G1收集器除了并发标记外，其余阶段也是要完全暂停用户线程的，换言之，它并非纯粹地追求低延迟，
+
+官方给它设定的目标是在延迟可控的情况下获得尽可能高的吞吐量
+
+#### G1 的 Minor GC/Young GC
+
+在分配一般对象时，当所有eden region使用达到最大阈值并且无法申请足够内存时，会触发一次YGC。每次YGC会回收所有Eden以及Survivor区，并且将存活对象复制到Old区以及另一部分的Survivor区。
+
+![Image text](img/1586773132.jpg)
+
+下面是一段经过抽取的GC日志：
+```  
+GC pause (G1 Evacuation Pause) (young)
+  ├── Parallel Time
+    ├── GC Worker Start
+    ├── Ext Root Scanning
+    ├── Update RS
+    ├── Scan RS
+    ├── Code Root Scanning
+    ├── Object Copy
+  ├── Code Root Fixup
+  ├── Code Root Purge
+  ├── Clear CT
+  ├── Other
+    ├── Choose CSet
+    ├── Ref Proc
+    ├── Ref Enq
+    ├── Redirty Cards
+    ├── Humongous Register
+    ├── Humongous Reclaim
+    ├── Free CSet
+```  
+
+由这段GC日志我们可知，整个YGC由多个子任务以及嵌套子任务组成，且一些核心任务为：Root Scanning，Update/Scan RS，Object Copy，CleanCT，Choose CSet，Ref Proc，Humongous Reclaim，Free CSet。
+#### G1 的 Mixed GC
+
+当越来越多的对象晋升到老年代Old Region 时，为了避免堆内存被耗尽，虚拟机会触发一个混合的垃圾收集器，即Mixed GC，
+
+是收集整个新生代以及部分老年代的垃圾收集。除了回收整个Young Region，还会回收一部分的Old Region ，这里需要注意：是一部分老年代，
+
+而不是全部老年代，可以选择哪些Old Region 进行收集，从而可以对垃圾回收的耗时时间进行控制。
+
+Mixed GC的整个子任务和YGC完全一样，只是回收的范围不一样。
+
+![Image text](img/1586773329.jpg)
+
+**注：G1 一般来说是没有FGC的概念的。因为它本身不提供FGC的功能。**
+
+如果 Mixed GC 仍然效果不理想，跟不上新对象分配内存的需求，会使用 Serial Old GC 进行 Full GC强制收集整个 Heap。
+相比CMS，G1总结有以下优点：
+G1运作期间不会产生内存空间碎片，垃圾收集完成之后能提供规整的可用内存。这种特性有利于程序长时间运行。
+G1 能预测 GC 停顿时间， STW 时间可控（G1 uses a pause prediction model to meet a user-defined pause time target and selects the number of regions to collect based on the specified pause time target.）
+关于G1实际上还有很多的细节可以讲，这里希望读者去阅读《深入理解Java虚拟机》或者其他资料来延伸学习，查漏补缺。
+
+![Image text](img/1586773413.jpg)
