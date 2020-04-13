@@ -236,3 +236,6 @@ phantomReference = new PhantomReference<>(new MyClass(), new ReferenceQueue<>())
 意思就是说，在JVM中你通常会看到两种收集器组合使用。下图是JVM 中所有的收集器（Java 8 ），其中有连线的就是可以组合的。
 
 ![Image text](img/1586771707.jpg)
+
+为了减小复杂性，快速记忆，我这边直接给出比较常用的几种组合。其他的要么是已经废弃了要么就是在现实情况下不实用的。
+
