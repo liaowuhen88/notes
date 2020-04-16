@@ -130,6 +130,74 @@ Spring 容器使用依赖注入来管理组成应用程序的组件。
  不会覆盖 setter 属性    | 会覆盖 setter 属性
  任意修改都会创建一个新实例 | 任意修改不会创建一个新实例 
  适用于设置很多属性 | 适用于设置少量属性 
+
+### 2.5. spring 中有多少种 IOC 容器？
+
+* BeanFactory - BeanFactory 就像一个包含 bean 集合的工厂类。它会在客户端要求时实例化 bean。
+* ApplicationContext - ApplicationContext 接口扩展了 BeanFactory 接口。它在 BeanFactory 基础上提供了一些额外的功能。	
+
+###  2.6. 区分 BeanFactory 和 ApplicationContext。	
+
+  BeanFactory  |ApplicationContext
+        ---- | ----- 
+ 它使用懒加载            | 它使用即时加载
+ 它使用语法显式提供资源对象    | 它自己创建和管理资源对象
+ 不支持国际化 | 支持国际化
+ 不支持基于依赖的注解 | 支持基于依赖的注解
+ 
+ ### 2.7. 列举 IoC 的一些好处。
+ 
+ IoC 的一些好处是：
+ 
+ * 它将最小化应用程序中的代码量。
+ 
+ * 它将使您的应用程序易于测试，因为它不需要单元测试用例中的任何单例或 JNDI 查找机制。
+ 
+ * 它以最小的影响和最少的侵入机制促进松耦合。
+ 
+ * 它支持即时的实例化和延迟加载服务。
+ 
+ ### 2.8. Spring IoC 的实现机制。
+ 
+ Spring 中的 IoC 的实现原理就是工厂模式加反射机制。Spring的核心思想，总结得非常好，推荐大家看下。
+ 
+ 示例：
+ ```  
+ interface Fruit {
+      public abstract void eat();
+ }
+ class Apple implements Fruit {
+     public void eat(){
+         System.out.println("Apple");
+     }
+ }
+ class Orange implements Fruit {
+     public void eat(){
+         System.out.println("Orange");
+     }
+ }
+ class Factory {
+     public static Fruit getInstance(String ClassName) {
+         Fruit f=null;
+         try {
+             f=(Fruit)Class.forName(ClassName).newInstance();
+         } catch (Exception e) {
+             e.printStackTrace();
+         }
+         return f;
+     }
+ }
+ class Client {
+     public static void main(String[] a) {
+         Fruit f=Factory.getInstance("io.github.dunwu.spring.Apple");
+         if(f!=null){
+             f.eat();
+         }
+     }
+ }
+```  
+ 
+ 
 	
 
 
@@ -138,4 +206,9 @@ Spring 容器使用依赖注入来管理组成应用程序的组件。
 
 
 
-适用于设置少量属性
+
+
+
+
+
+
