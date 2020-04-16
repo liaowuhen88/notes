@@ -196,15 +196,129 @@ Spring 容器使用依赖注入来管理组成应用程序的组件。
      }
  }
 ```  
+
+ ## Beans
  
- 
-	
+### 3.1. 什么是 spring bean？
 
+* 它们是构成用户应用程序主干的对象。
+* Bean 由 Spring IoC 容器管理。
+* 它们由 Spring IoC 容器实例化，配置，装配和管理。
+* Bean 是基于用户提供给容器的配置元数据创建。
 
+### 3.2. spring 提供了哪些配置方式？
+* 基于 xml 配置
 
+bean 所需的依赖项和服务在 XML 格式的配置文件中指定。这些配置文件通常包含许多 bean 定义和特定于应用程序的配置选项。它们通常以 bean 标签开头。例如：
+```  
+<bean id="studentbean" class="org.edureka.firstSpring.StudentBean">
+ <property name="name" value="Edureka"></property>
+</bean>
+```  
+* 基于注解配置
 
+您可以通过在相关的类，方法或字段声明上使用注解，将 bean 配置为组件类本身，
 
+而不是使用 XML 来描述 bean 装配。默认情况下，Spring 容器中未打开注解装配。因此，您需要在使用它之前在 Spring 配置文件中启用它。例如：
+```  
+<beans>
+<context:annotation-config/>
+<!-- bean definitions go here -->
+</beans>
+```  
+* 基于 Java API 配置
 
+Spring 的 Java 配置是通过使用 @Bean 和 @Configuration 来实现。
+
+@Bean 注解扮演与 元素相同的角色。
+
+@Configuration 类允许通过简单地调用同一个类中的其他 @Bean 方法来定义 bean 间依赖关系。
+
+例如：
+```  
+@Configuration
+public class StudentConfig {
+    @Bean
+    public StudentBean myStudent() {
+        return new StudentBean();
+    }
+}
+```  
+
+### 3.3. spring 支持集中 bean scope？
+
+Spring bean 支持 5 种 scope：
+
+* Singleton - 每个 Spring IoC 容器仅有一个单实例。
+
+* Prototype - 每次请求都会产生一个新的实例。
+
+* Request - 每一次 HTTP 请求都会产生一个新的实例，并且该 bean 仅在当前 HTTP 请求内有效。
+
+* Session - 每一次 HTTP 请求都会产生一个新的 bean，同时该 bean 仅在当前 HTTP session 内有效。
+
+* Global-session - 类似于标准的 HTTP Session 作用域，不过它仅仅在基于 portlet 的 web 应用中才有意义。
+
+Portlet 规范定义了全局 Session 的概念，它被所有构成某个 portlet web 应用的各种不同的 portlet 所共享。
+
+在 global session 作用域中定义的 bean 被限定于全局 portlet Session 的生命周期范围内。如果你在 web 中使用 global session 作用域来标识 bean，那么 web 会自动当成 session 类型来使用。
+
+仅当用户使用支持 Web 的 ApplicationContext 时，最后三个才可用。这篇推荐看下：Spring bean scope详解。关注微信公众号：Java技术栈，在后台回复：spring，可以获取我整理的 N 篇最新Spring 教程，都是干货。
+
+### 3.4. spring bean 容器的生命周期是什么样的？
+
+spring bean 容器的生命周期流程如下：
+
+* Spring 容器根据配置中的 bean 定义中实例化 bean
+
+* Spring 使用依赖注入填充所有属性，如 bean 中所定义的配置。
+
+* 如果 bean 实现 BeanNameAware 接口，则工厂通过传递 bean 的 ID 来调用 setBeanName()。
+
+* 如果 bean 实现 BeanFactoryAware 接口，工厂通过传递自身的实例来调用 setBeanFactory()。
+
+* 如果存在与 bean 关联的任何 BeanPostProcessors，则调用 preProcessBeforeInitialization() 方法。
+
+* 如果为 bean 指定了 init 方法（ 的 init-method 属性），那么将调用它。
+
+* 最后，如果存在与 bean 关联的任何 BeanPostProcessors，则将调用 postProcessAfterInitialization() 方法。
+
+* 如果 bean 实现 DisposableBean 接口，当 spring 容器关闭时，会调用 destory()。
+
+* 如果为 bean 指定了 destroy 方法（ 的 destroy-method 属性），那么将调用它。
+
+![Image text](img/1587038965.jpg)
+
+### 3.5. 什么是 spring 的内部 bean？
+
+只有将 bean 用作另一个 bean 的属性时，才能将 bean 声明为内部 bean。为了定义 bean，Spring 的基于 XML 的配置元数据在 <property> 或 <constructor-arg> 中提供了 <bean> 元素的使用。内部 bean 总是匿名的，它们总是作为原型。
+
+例如，假设我们有一个 Student 类，其中引用了 Person 类。这里我们将只创建一个 Person 类实例并在 Student 中使用它。
+
+Student.java
+```  
+public class Student {
+    private Person person;
+    //Setters and Getters
+}
+public class Person {
+    private String name;
+    private String address;
+    //Setters and Getters
+}
+```  
+bean.xml
+```  
+<bean id=“StudentBean" class="com.edureka.Student">
+    <property name="person">
+        <!--This is inner bean -->
+        <bean class="com.edureka.Person">
+            <property name="name" value=“Scott"></property>
+            <property name="address" value=“Bangalore"></property>
+        </bean>
+    </property>
+</bean>
+```  
 
 
 
