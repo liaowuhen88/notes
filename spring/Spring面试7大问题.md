@@ -319,10 +319,194 @@ bean.xml
     </property>
 </bean>
 ```  
+### 3.6. 什么是 spring 装配
+
+当 bean 在 Spring 容器中组合在一起时，它被称为装配或 bean 装配。Spring 容器需要知道需要什么 bean 以及容器应该如何使用依赖注入来将 bean 绑定在一起，同时装配 bean。
+
+### 3.7. 自动装配有哪些方式？
+
+Spring 容器能够自动装配 bean。也就是说，可以通过检查 BeanFactory 的内容让 Spring 自动解析 bean 的协作者。
 
 
 
+自动装配的不同模式：
+
+* no - 这是默认设置，表示没有自动装配。应使用显式 bean 引用进行装配。
+
+* byName - 它根据 bean 的名称注入对象依赖项。它匹配并装配其属性与 XML 文件中由相同名称定义的 bean。
+
+* byType - 它根据类型注入对象依赖项。如果属性的类型与 XML 文件中的一个 bean 名称匹配，则匹配并装配属性。
+
+* 构造函数 - 它通过调用类的构造函数来注入依赖项。它有大量的参数。
+
+* autodetect - 首先容器尝试通过构造函数使用 autowire 装配，如果不能，则尝试通过 byType 自动装配
+
+### 3.8. 自动装配有什么局限？
+
+* 覆盖的可能性 - 您始终可以使用 和 设置指定依赖项，这将覆盖自动装配。
+
+* 基本元数据类型 - 简单属性（如原数据类型，字符串和类）无法自动装配。
+
+* 令人困惑的性质 - 总是喜欢使用明确的装配，因为自动装配不太精确。
+
+## 注解
+
+### 4.1. 你用过哪些重要的 Spring 注解？
+
+Spring 最常用的 7 大类注解，这篇推荐看下。
+
+* @Controller - 用于 Spring MVC 项目中的控制器类。
+
+* @Service - 用于服务类。
+
+* @RequestMapping - 用于在控制器处理程序方法中配置 URI 映射。
+
+* @ResponseBody - 用于发送 Object 作为响应，通常用于发送 XML 或 JSON 数据作为响应。
+
+* @PathVariable - 用于将动态值从 URI 映射到处理程序方法参数。
+
+* @Autowired - 用于在 spring bean 中自动装配依赖项。
+
+* @Qualifier - 使用 @Autowired 注解，以避免在存在多个 bean 类型实例时出现混淆。
+
+* @Scope - 用于配置 spring bean 的范围。
+
+* @Configuration，@ComponentScan 和 @Bean - 用于基于 java 的配置。
+
+* @Aspect，@Before，@After，@Around，@Pointcut - 用于切面编程（AOP）。
+
+### 4.2. 如何在 spring 中启动注解装配？
+
+默认情况下，Spring 容器中未打开注解装配。因此，要使用基于注解装配，我们必须通过配置<context：annotation-config /> 元素在 Spring 配置文件中启用它。
+
+### 4.3. @Component, @Controller, @Repository, @Service 有何区别？
+
+* @Component：这将 java 类标记为 bean。它是任何 Spring 管理组件的通用构造型。spring 的组件扫描机制现在可以将其拾取并将其拉入应用程序环境中。
+
+* @Controller：这将一个类标记为 Spring Web MVC 控制器。标有它的 Bean 会自动导入到 IoC 容器中。
+
+* @Service：此注解是组件注解的特化。它不会对 @Component 注解提供任何其他行为。您可以在服务层类中使用 @Service 而不是 @Component，因为它以更好的方式指定了意图。
+
+* @Repository：这个注解是具有类似用途和功能的 @Component 注解的特化。它为 DAO 提供了额外的好处。它将 DAO 导入 IoC 容器，并使未经检查的异常有资格转换为 Spring DataAccessException。
+
+### 4.4. @Required 注解有什么用？
+
+@Required 应用于 bean 属性 setter 方法。此注解仅指示必须在配置时使用 bean 定义中的显式属性值或使用自动装配填充受影响的 bean 属性。如果尚未填充受影响的 bean 属性，则容器将抛出 BeanInitializationException。
+
+示例：
+```  
+public class Employee {
+    private String name;
+    @Required
+    public void setName(String name){
+        this.name=name;
+    }
 
 
+    public string getName(){
+        return name;
+    }
+}
+```  
+### 4.5. @Autowired 注解有什么用？
 
+@Autowired 可以更准确地控制应该在何处以及如何进行自动装配。
+
+此注解用于在 setter 方法，构造函数，具有任意名称或多个参数的属性或方法上自动装配 bean。默认情况下，它是类型驱动的注入。
+```  
+public class Employee {
+    private String name;
+    @Autowired
+    public void setName(String name) {
+        this.name=name;
+    }
+    public string getName(){
+        return name;
+    }
+}
+```  
+### 4.6. @Qualifier 注解有什么用？
+
+当您创建多个相同类型的 bean 并希望仅使用属性装配其中一个 bean 时，您可以使用@Qualifier 注解和 @Autowired 通过指定应该装配哪个确切的 bean 来消除歧义。
+
+例如，这里我们分别有两个类，Employee 和 EmpAccount。在 EmpAccount 中，使用@Qualifier 指定了必须装配 id 为 emp1 的 bean。
+```  
+public class Employee {
+    private String name;
+    @Autowired
+    public void setName(String name) {
+        this.name=name;
+    }
+    public string getName() {
+        return name;
+    }
+}
+```  
+EmpAccount.java
+```
+public class EmpAccount {
+    private Employee emp;
+
+    @Autowired
+    @Qualifier(emp1)
+    public void showName() {
+        System.out.println(“Employee name : ”+emp.getName);
+    }
+}
+```
+### 4.7. @RequestMapping 注解有什么用？
+
+@RequestMapping 注解用于将特定 HTTP 请求方法映射到将处理相应请求的控制器中的特定类/方法。Spring MVC常用注解，推荐看下。
+
+此注解可应用于两个级别：
+
+* 类级别：映射请求的 URL
+
+* 方法级别：映射 URL 以及 HTTP 请求方法
+
+## 数据访问
+
+### 5.1. spring DAO 有什么用？
+
+Spring DAO 使得 JDBC，Hibernate 或 JDO 这样的数据访问技术更容易以一种统一的方式工作。这使得用户容易在持久性技术之间切换。
+
+它还允许您在编写代码时，无需考虑捕获每种技术不同的异常。
+
+### 5.2. 列举 Spring DAO 抛出的异常。
+
+![Image text](img/1587039790.jpg)
+
+### 5.3. spring JDBC API 中存在哪些类？
+
+* JdbcTemplate
+
+* SimpleJdbcTemplate
+
+* NamedParameterJdbcTemplate
+
+* SimpleJdbcInsert
+
+* SimpleJdbcCall
+
+### 5.4. 使用 Spring 访问 Hibernate 的方法有哪些？
+我们可以通过两种方式使用 Spring 访问 Hibernate：
+
+* 使用 Hibernate 模板和回调进行控制反转
+
+* 扩展 HibernateDAOSupport 并应用 AOP 拦截器节点
+
+### 5.5. 列举 spring 支持的事务管理类型
+
+Spring 支持两种类型的事务管理：
+
+* 程序化事务管理：在此过程中，在编程的帮助下管理事务。它为您提供极大的灵活性，但维护起来非常困难。
+
+* 声明式事务管理：在此，事务管理与业务代码分离。仅使用注解或基于 XML 的配置来管理事务。
+### 5.6. spring 支持哪些 ORM 框架
+
+* Hibernate
+* iBatis
+* JPA
+* JDO
+* OJB
 
