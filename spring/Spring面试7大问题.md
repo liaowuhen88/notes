@@ -510,3 +510,81 @@ Spring 支持两种类型的事务管理：
 * JDO
 * OJB
 
+## AOP
+
+### 6.1. 什么是 AOP？
+
+AOP(Aspect-Oriented Programming), 即 面向切面编程, 它与 OOP( Object-Oriented Programming, 面向对象编程) 相辅相成, 提供了与 OOP 不同的抽象软件结构的视角。
+
+在 OOP 中, 我们以类(class)作为我们的基本单元, 而 AOP 中的基本单元是 Aspect(切面)
+
+### 6.2. AOP 中的 Aspect、Advice、Pointcut、JointPoint 和 Advice 参数分别是什么？
+
+![Image text](img/1587088384.jpg)
+
+* 1.Aspect - Aspect 是一个实现交叉问题的类，例如事务管理。方面可以是配置的普通类，然后在 Spring Bean 配置文件中配置，或者我们可以使用 Spring AspectJ 支持使用 @Aspect 注解将类声明为 Aspect。
+
+* 2.Advice - Advice 是针对特定 JoinPoint 采取的操作。在编程方面，它们是在应用程序中达到具有匹配切入点的特定 JoinPoint 时执行的方法。您可以将 Advice 视为 Spring 拦截器（Interceptor）或 Servlet 过滤器（filter）。
+
+* 3.Advice Arguments - 我们可以在 advice 方法中传递参数。我们可以在切入点中使用 args() 表达式来应用于与参数模式匹配的任何方法。如果我们使用它，那么我们需要在确定参数类型的 advice 方法中使用相同的名称。
+
+* 4.Pointcut - Pointcut 是与 JoinPoint 匹配的正则表达式，用于确定是否需要执行 Advice。Pointcut 使用与 JoinPoint 匹配的不同类型的表达式。Spring 框架使用 AspectJ Pointcut 表达式语言来确定将应用通知方法的 JoinPoint。
+
+* 5.JoinPoint - JoinPoint 是应用程序中的特定点，例如方法执行，异常处理，更改对象变量值等。在 Spring AOP 中，JoinPoint 始终是方法的执行器。
+
+### 6.3. 什么是通知（Advice）？
+
+特定 JoinPoint 处的 Aspect 所采取的动作称为 Advice。Spring AOP 使用一个 Advice 作为拦截器，在 JoinPoint “周围”维护一系列的拦截器。
+
+### 6.4. 有哪些类型的通知（Advice）？
+
+* Before - 这些类型的 Advice 在 joinpoint 方法之前执行，并使用 @Before 注解标记进行配置。
+
+* After Returning - 这些类型的 Advice 在连接点方法正常执行后执行，并使用@AfterReturning 注解标记进行配置。
+
+* After Throwing - 这些类型的 Advice 仅在 joinpoint 方法通过抛出异常退出并使用 @AfterThrowing 注解标记配置时执行。
+
+* After (finally) - 这些类型的 Advice 在连接点方法之后执行，无论方法退出是正常还是异常返回，并使用 @After 注解标记进行配置。
+
+* Around - 这些类型的 Advice 在连接点之前和之后执行，并使用 @Around 注解标记进行配置。
+
+### 6.5. 指出在 spring aop 中 concern 和 cross-cutting concern 的不同之处。
+
+concern 是我们想要在应用程序的特定模块中定义的行为。它可以定义为我们想要实现的功能。
+
+cross-cutting concern 是一个适用于整个应用的行为，这会影响整个应用程序。例如，日志记录，安全性和数据传输是应用程序几乎每个模块都需要关注的问题，因此它们是跨领域的问题。
+
+### 6.6. AOP 有哪些实现方式？
+
+实现 AOP 的技术，主要分为两大类：
+
+* 静态代理 - 指使用 AOP 框架提供的命令进行编译，从而在编译阶段就可生成 AOP 代理类，因此也称为编译时增强；
+
+* 编译时编织（特殊编译器实现）
+
+* 类加载时编织（特殊的类加载器实现）。
+
+* 动态代理 - 在运行时在内存中“临时”生成 AOP 动态代理类，因此也被称为运行时增强。
+
+* JDK 动态代理
+
+* CGLIB
+
+### 6.7. Spring AOP and AspectJ AOP 有什么区别？
+
+Spring AOP 基于动态代理方式实现；AspectJ 基于静态代理方式实现。
+
+Spring AOP 仅支持方法级别的 PointCut；提供了完全的 AOP 支持，它还支持属性级别的 PointCut。
+
+### 6.8. 如何理解 Spring 中的代理？
+
+将 Advice 应用于目标对象后创建的对象称为代理。在客户端对象的情况下，目标对象和代理对象是相同的。详解 Java 中的三种代理模式，这篇看下。
+```
+Advice + Target Object = Proxy
+```
+
+### 6.9. 什么是编织（Weaving）？
+
+为了创建一个 advice 对象而链接一个 aspect 和其它应用类型或对象，称为编织（Weaving）。在 Spring AOP 中，编织在运行时执行。请参考下图：
+
+![Image text](img/1587089039.jpg)
