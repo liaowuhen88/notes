@@ -1,4 +1,4 @@
-package com.zwc.notes.rk;
+package com.zwc.notes.rk.string;
 
 public class RK {
     public static int rabinKarp(String str, String pattern) {
