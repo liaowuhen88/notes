@@ -16,7 +16,7 @@ import java.util.HashMap;
 public class DynamicKingGold {
     public static void main(String[] args) {
         int n = 5;
-        int w = 18;
+        int w = 20;
         int[] g = new int[]{0, 400, 500, 200, 300, 350};
         int[] p = new int[]{0, 5, 5, 3, 4, 3};
 
@@ -96,47 +96,30 @@ public class DynamicKingGold {
             return 0;
         }
         if (n == 1) {
-            if (w < p[0]) {
+            if (w < p[1]) {
                 return 0;
             } else {
-                return g[0];
+                return g[1];
             }
         }
 
-        if (w < p[n - 1]) {
-            String key = n - 1 + "_" + w;
-            if (map.containsKey(key)) {
-                return map.get(key);
-            } else {
-                int num = memorandum(n - 1, w, g, p, map);
-                //System.out.println(keyA);
-                map.put(key, num);
-                return num;
-            }
+        String key = n + "_" + w;
+        if (map.containsKey(key)) {
+            return map.get(key);
         } else {
-            String keyA = n - 1 + "_" + w;
-            String keyB = n - 1 + "_" + (w - p[n - 1]);
-            int a;
-            int b;
-            if (map.containsKey(keyA)) {
-                a = map.get(keyA);
+            int num = 0;
+            if (w < p[n]) {
+                num = memorandum(n - 1, w, g, p, map);
             } else {
-                a = memorandum(n - 1, w, g, p, map);
-                //System.out.println(keyA);
-                map.put(keyA, a);
+                int a = memorandum(n - 1, w, g, p, map);
+                int b = memorandum(n - 1, w - p[n], g, p, map) + g[n];
+                num = a > b ? a : b;
             }
-            if (map.containsKey(keyB)) {
-                b = map.get(keyB);
-            } else {
-                b = memorandum(n - 1, w - p[n - 1], g, p, map) + g[n - 1];
-                map.put(keyB, b);
-                //System.out.println(keyB);
-            }
-
-            int num = a > b ? a : b;
-            //System.out.println("n:"+n+"----w:" + w+"----num:" + num);
+            map.put(key, num);
+            //System.out.println("key:"+key+"----num:" + num);
             return num;
         }
+
     }
 
     public static int dynamic(int n, int w, int[] g, int[] p) {
@@ -176,7 +159,7 @@ public class DynamicKingGold {
                 }
             }
             System.arraycopy(results, 0, preResults, 0, results.length);
-            System.out.println("preResults:" + JSON.toJSONString(preResults));
+            //System.out.println("preResults:" + JSON.toJSONString(preResults));
         }
 
         return results[w];
