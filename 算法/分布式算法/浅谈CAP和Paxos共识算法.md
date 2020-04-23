@@ -122,3 +122,27 @@ Lesile Lamport，Latex 的发明者，提出了 Paxos 算法。他虚拟了一�
 * Accpetor:  提议投票和接收者，只有在形成法定人数（Quorum，即 Majority 多数派）时，提议才会最终被接受。如国会。
 
 * Learner:  提议接受者，backup，备份，对集群的一致性没影响。如记录员。
+
+**步骤、阶段：**
+
+![Image text](img/1587611181.jpg)
+
+* 1.Phase1a: Prepare
+
+proposer 提出一个议案，编号为 N，N 一定大于这个 proposer 之前提出的提案编号，请求 acceptor 的 quorum（大多数） 接受。
+
+* 2.Phase1b: Promise
+
+如果 N 大于此 acceptor 之前接受的任何提案编号则接受，否则拒绝。
+
+* 3.Phase2a: Accept
+
+如果达到了多数派，proposer 会发出 accept 请求，此请求包含上一步的提案编号和提案内容。
+
+* 4.Phase2b: Accepted
+
+如果此 acceptor 在此期间没有收到任何大于 N 的提案，则接受此提案内容，否则忽略。
+
+还记得上文中我们提到过，同步编号是非常重要的问题，绿色框出来的实际上就是同步编号的过程。通过这个编号，就知道每条操作日志的先后顺序。简单说来，第一阶段，获取编号，第二阶段，写入日志。可以看出来，Paxos 通过两轮交互，牺牲时间和性能来达到弥补一致性的问题。
+
+现在我们考虑部分节点 down 掉的情景。
