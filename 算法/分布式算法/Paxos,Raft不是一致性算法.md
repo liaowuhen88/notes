@@ -22,8 +22,18 @@ Leslie Lamport于1998年在ACM Transactions on Computer Systems上发表了一�
 
 ![Image text](img/1587607295.jpg)
 
+
 也就是说，Paxos论文通篇提都没提Consistency一词，何来的“Paxos is a consistency algorithm”的说法。
 
 与此类似的是，在Raft论文《In Search of an Understandable Consensus Algorithm (Extended Version)》[3]中开头就对Raft给出了明确的定义：Raft is a consensus algorithm....，注意这里是consensus，而不是consistency。
 
+从专业的角度来讲，我们通常所说的
+
+* 一致性（Consistency）在分布式系统中指的是对于同一个数据的多个副本，其对外表现的数据一致性，如强一致性、顺序一致性、最终一致性等，都是用来描述副本问题中的一致性的。
+
+* 而共识（Consensus）则不同，简单来说，共识问题是要经过某种算法使多个节点达成相同状态的一个过程。一致性强调结果，共识强调过程。
+
+《分布式系统概念与设计》一书中对共识问题进行了如下定义：为达到共识，每个进程 pi 最初处于未决（undecided）状态，并且提议集合D中的一个值 vi 。进程之间互相通信，交换值。然后，每个进程设置一个决定变量（decision variable）di 的值。在这种情况下，它进入决定（decided）状态。在此状态下，他不再改变di。
+
+下图中给出了参与一个共识算法的3个进程。两个进程提议“继续”， 第三个进程提议“放弃”但随后崩溃。保持正确的两个进程都决定“继续”。（其中i = 1, 2, ……, N; j = 1, 2, ……, N。）
 
