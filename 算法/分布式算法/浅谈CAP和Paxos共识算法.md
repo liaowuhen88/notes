@@ -146,3 +146,74 @@ proposer 提出一个议案，编号为 N，N 一定大于这个 proposer 之前
 还记得上文中我们提到过，同步编号是非常重要的问题，绿色框出来的实际上就是同步编号的过程。通过这个编号，就知道每条操作日志的先后顺序。简单说来，第一阶段，获取编号，第二阶段，写入日志。可以看出来，Paxos 通过两轮交互，牺牲时间和性能来达到弥补一致性的问题。
 
 现在我们考虑部分节点 down 掉的情景。
+
+![Image text](img/1587612042.jpg)
+
+由于是多数派 accptor 达成了一致，第一阶段仍然成功获得了编号，所有最终还是成功的。
+
+考虑 proposer down 掉的情景。
+
+![Image text](img/1587612146.jpg)
+
+没关系，虽然第一个 proposer 失败，但下一个 proposer 用更大的提案编号，所以下一次 proposer 最终还是成功了，仍然保证了可用性和一致性。
+
+#### 潜在问题：活锁
+
+![Image text](img/1587612250.jpg)
+
+Paxos 存在活锁问题。
+
+如图，当 第一个 proposer 在第一阶段发出请求，还没来得及后续的第二阶段请求，紧接着第二个 proposer 在第一阶段也发出请求，
+
+如果这样无穷无尽，acceptor 始终停留在决定顺序号的过程上，那大家谁也成功不了，
+
+遇到这样的问题，其实很好解决，如果发现顺序号被新的 proposer 更新了，则引入一个随机的等待的超时时间，这样就避免了多个 proposer 发生冲突的问题。
+
+#### Multi Paxos
+
+由于 Paxos 存在的问题：难实现、效率低（2 轮 rpc）、活锁。
+
+因此又引入了 Multi Paxos，Multi Paxos 引入 Leader，也就是唯一的 proposer，所有的请求都需经过此 Leader。
+
+![Image text](img/1587612364.jpg)
+
+因为只有一个节点维护提案编号，这样，就省略了第一轮讨论提议编号的过程。
+
+然后进一步简化角色。
+
+![Image text](img/1587612415.jpg)
+
+Servers 中第左边的就是 Proposer，另外两个和自身充当 acceptor，这样就更像我们真实的系统了。
+
+Raft 和 ZAB 协议其实基本上和这个一致，两者的差别很小，就是心跳的方向不一样。
+
+**Raft 和 ZAB**
+
+Raft 和 ZAB 协议将 Multi Paxos 划分了三个子问题：
+
+* Leader Election
+
+* Log Replication
+
+* Safety
+
+在 leader 选举的过程中，也重定义角色：
+
+* Leader
+
+* Follower
+
+* Candidate
+
+这个动画网站生动展示了 leader 选举和日志复制的过程。在这里就不多讲了。
+
+另外，raft 官方网站可以自己操作模拟选举的过程。
+
+### 总结
+今天，我们从 CAP 谈到 Raft 和 ZAB，中间穿插了各种名词，模型无论怎么变化，我们始终只有一个目的，
+
+那就是在一个fault torlerance 的分布式架构下，如何尽量保证其整个系统的可用性和一致性。
+
+最理想的模型当然是 Paxos，然而理论到落地还是有差距的，所以诞生了 Raft 和 ZAB，虽然只有一个 leader，
+
+但我们允许 leader 挂掉可以重新选举 leader，这样，中心式和分布式达到了一个妥协。
