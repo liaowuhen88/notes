@@ -19,9 +19,10 @@ mysql> select * from T where ID=1；
   
 * 存储引擎层：
 
-### 1.负责数据的存储和提取。其架构模式是插件式的，支持InnoDB、MyISAM、Memory等多个存储引擎。现在最常用的存储引擎是InnoDB，它从MySQL 5.5.5版本开始成为了默认存储引擎。
+#### 1.负责数据的存储和提取。其架构模式是插件式的，支持InnoDB、MyISAM、Memory等多个存储引擎。现在最常用的存储引擎是InnoDB，它从MySQL 5.5.5版本开始成为了默认存储引擎。
 
-### 2.执行create table建表的时候，如果不指定引擎类型，默认使用的就是InnoDB)。
+#### 2.执行create table建表的时候，如果不指定引擎类型，默认使用的就是InnoDB)。
 
-### 3.在create table语句中使用engine=memory, 来指定使用内存引擎创建表。不同存储引擎的表数据存取方式不同，支持的功能也不同。
+#### 3.在create table语句中使用engine=memory, 来指定使用内存引擎创建表。不同存储引擎的表数据存取方式不同，支持的功能也不同。
 
+### 一 连接器
