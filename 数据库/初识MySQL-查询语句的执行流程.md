@@ -76,17 +76,17 @@ mysql> select SQL_CACHE * from T where ID=1；
 
 ### 三 分析器
 
-1.先检查该语句是否有权限，如果没有权限，直接返回错误信息，如果有权限，在mysql8.0版本以前，会先查询缓存，
+* 1.先检查该语句是否有权限，如果没有权限，直接返回错误信息，如果有权限，在mysql8.0版本以前，会先查询缓存，
 
    以这条sql语句为key在内存中查询是否有结果，如果有直接缓存，如果没有，执行下一步。
 
-2.没有命中查询缓存，就要开始真正执行语句了。首先，MySQL需要知道你要做什么，因此需要对SQL语句做解析。
+* 2.没有命中查询缓存，就要开始真正执行语句了。首先，MySQL需要知道你要做什么，因此需要对SQL语句做解析。
 
-3.分析器先会做“词法分析”。输入的是由多个字符串和空格组成的一条SQL语句，MySQL需要识别出里面的字符串分别是什么，代表什么（MySQL从输入的"select"这个关键字识别出来，这是一个查询语句。它也要把字符串“T”识别成“表名T”，把字符串“ID”识别成“列ID”）。
+* 3.分析器先会做“词法分析”。输入的是由多个字符串和空格组成的一条SQL语句，MySQL需要识别出里面的字符串分别是什么，代表什么（MySQL从输入的"select"这个关键字识别出来，这是一个查询语句。它也要把字符串“T”识别成“表名T”，把字符串“ID”识别成“列ID”）。
 
-4.接着开始做“语法分析”，根据词法分析的结果，语法分析器会根据语法规则，判断你输入的这个SQL语句是否满足MySQL语法。（如果你的语句不对，就会收到“You have an error in your SQL syntax”的错误提醒，比如下面这个语句select少打了开头的字母“s”。）
+* 4.接着开始做“语法分析”，根据词法分析的结果，语法分析器会根据语法规则，判断你输入的这个SQL语句是否满足MySQL语法。（如果你的语句不对，就会收到“You have an error in your SQL syntax”的错误提醒，比如下面这个语句select少打了开头的字母“s”。）
 ```
-mysql> elect * from t where ID=1;
+mysql> select * from t where ID=1;
 
 ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'elect * from t where ID=1' at line 1
 ```
