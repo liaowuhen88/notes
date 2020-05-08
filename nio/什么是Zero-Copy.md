@@ -55,3 +55,57 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 下图展示了在使用transferTo()之后的上下文切换：
 
 ![Image text](img/1588929382.jpg)
+
+使用了Zero-Copy技术之后，整个过程如下：
+
+* 1.transferTo()方法使得文件A的内容直接拷贝到一个read buffer（kernel buffer）中；
+
+* 2.然后数据(kernel buffer)拷贝到socket buffer中。
+
+* 3.最后将socket buffer中的数据拷贝到网卡设备（protocol engine）中传输；
+
+这显然是一个伟大的进步：这里把上下文的切换次数从4次减少到2次，同时也把数据copy的次数从4次降低到了3次。
+
+**但是这是Zero-Copy么，答案是否定的。**
+
+## 进阶
+
+Linux 2.1内核开始引入了sendfile函数（上一节有提到）,用于将文件通过socket传送。
+```  
+sendfile(socket, file, len);
+```  
+
+该函数通过一次系统调用完成了文件的传送，减少了原来read/write方式的模式切换。此外更是减少了数据的copy, sendfile的详细过程如图：
+
+![Image text](img/1588929595.jpg)
+
+通过sendfile传送文件只需要一次系统调用，当调用sendfile时：
+
+* 1.首先（通过DMA）将数据从磁盘读取到kernel buffer中；
+
+* 2.然后将kernel buffer拷贝到socket buffer中；
+
+* 3.最后将socket buffer中的数据copy到网卡设备（protocol engine）中发送；
+
+**这个过程就是第二节（详述）中的那个步骤。**
+
+sendfile与read/write模式相比，少了一次copy。但是从上述过程中也可以发现从kernel buffer中将数据copy到socket buffer是没有必要的。
+
+Linux2.4 内核对sendfile做了改进，如图：
+
+![Image text](img/1588929914.jpg)
+
+改进后的处理过程如下：
+
+* 1.将文件拷贝到kernel buffer中；
+
+* 2.向socket buffer中追加当前要发生的数据在kernel buffer中的位置和偏移量；
+
+* 3.根据socket buffer中的位置和偏移量直接将kernel buffer的数据copy到网卡设备（protocol engine）中；
+
+经过上述过程，数据只经过了2次copy就从磁盘传送出去了。这个才是真正的Zero-Copy(这里的零拷贝是针对kernel来讲的，数据在kernel模式下是Zero-Copy)。
+
+正是Linux2.4的内核做了改进，Java中的TransferTo()实现了Zero-Copy,如下图：
+
+![Image text](img/1588930006.jpg)
+
