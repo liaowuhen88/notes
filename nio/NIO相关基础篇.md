@@ -124,14 +124,19 @@ select/epoll的好处就在于单个process就可以同时处理多个网络连�
   select就会返回。
 * 这个时候用户进程再调用read操作，将数据从内核拷贝到用户进程。
 
-这个图和blocking IO的图其实并没有太大的不同，事实上，还更差一些。因为这里需要使用两个system call (select 和 recvfrom)，
+这个图和blocking IO的图其实并没有太大的不同，事实上，还更差一些。
 
-而blocking IO只调用了一个system call (recvfrom)。但是，用select的优势在于它可以同时处理多个connection。
+因为这里需要使用两个system call (select 和 recvfrom)，
 
+而blocking IO只调用了一个system call (recvfrom)。
+
+但是，用select的优势在于它可以同时处理多个connection。
+
+```
 （多说一句。所以，如果处理的连接数不是很高的话，使用select/epoll的web server不一定比使用multi-threading + blocking IO
 
  的web server性能更好，可能延迟还更大。select/epoll的优势并不是对于单个连接能处理得更快，而是在于能处理更多的连接。）
-
+```
 在IO multiplexing Model中，实际中，对于每一个socket，一般都设置成为non-blocking，
 
 但是，如上图所示，整个用户的process其实是一直被block的。只不过process是被select这个函数block，而不是被socket IO给block。
