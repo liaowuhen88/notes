@@ -83,5 +83,57 @@
 
 **所以，blocking IO的特点就是在IO执行的两个阶段都被block了。**
 
+### 非阻塞I/O (Non-Blocking I/O)
 
+linux下，可以通过设置socket使其变为non-blocking。当对一个non-blocking socket执行读操作时，流程是这个样子：
+
+![Image text](img/1589182310.jpg)
+
+当用户进程调用recvfrom时，系统不会阻塞用户进程，而是立刻返回一个ewouldblock错误，从用户进程角度讲 ，并不需要等待，
+
+而是马上就得到了一个结果。用户进程判断标志是ewouldblock时，就知道数据还没准备好，于是它就可以去做其他的事了，
+
+于是它可以再次发送recvfrom，一旦内核中的数据准备好了。并且又再次收到了用户进程的system call，那么它马上就将数据拷贝到了用户内存，然后返回。
+
+当一个应用程序在一个循环里对一个非阻塞调用recvfrom，我们称为轮询。应用程序不断轮询内核，看看是否已经准备好了某些操作。
+
+这通常是浪费CPU时间，但这种模式偶尔会遇到。
+
+### I/O复用（I/O Multiplexing)
+
+IO multiplexing这个词可能有点陌生，但是如果我说select，epoll，大概就都能明白了。有些地方也称这种IO方式为event driven IO。我们都知道，
+
+select/epoll的好处就在于单个process就可以同时处理多个网络连接的IO。它的基本原理就是select/epoll这个function会不断的轮询所负责的所有socket，
+
+当某个socket有数据到达了，就通知用户进程。它的流程如图：
+
+![Image text](img/1589186740.jpg)
+
+* 当用户进程调用了select，那么整个进程会被block，而同时，内核会“监视”所有select负责的socket，当任何一个socket中的数据准备好了，
+  select就会返回。
+* 这个时候用户进程再调用read操作，将数据从内核拷贝到用户进程。
+
+这个图和blocking IO的图其实并没有太大的不同，事实上，还更差一些。因为这里需要使用两个system call (select 和 recvfrom)，
+
+而blocking IO只调用了一个system call (recvfrom)。但是，用select的优势在于它可以同时处理多个connection。
+
+（多说一句。所以，如果处理的连接数不是很高的话，使用select/epoll的web server不一定比使用multi-threading + blocking IO
+
+ 的web server性能更好，可能延迟还更大。select/epoll的优势并不是对于单个连接能处理得更快，而是在于能处理更多的连接。）
+
+在IO multiplexing Model中，实际中，对于每一个socket，一般都设置成为non-blocking，
+
+但是，如上图所示，整个用户的process其实是一直被block的。只不过process是被select这个函数block，而不是被socket IO给block。
+
+### 文件描述符fd
+
+Linux的内核将所有外部设备都可以看做一个文件来操作。那么我们对与外部设备的操作都可以看做对文件进行操作。
+
+我们对一个文件的读写，都通过调用内核提供的系统调用；内核给我们返回一个filede scriptor（fd,文件描述符）。
+
+而对一个socket的读写也会有相应的描述符，称为socketfd(socket描述符）。描述符就是一个数字，
+
+指向内核中一个结构体（文件路径，数据区，等一些属性）。那么我们的应用程序对文件的读写就通过对描述符的读写完成。
+
+### select
 
