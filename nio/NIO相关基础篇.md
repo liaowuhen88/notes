@@ -32,6 +32,56 @@
 
 **64位架构下，地址线是46个，所以最大的物理地址是2^46B，折合64TB，可用地址空间也是这么大（目前为止）**
 
+## Linux 网络 I/O模型
+
+我们都知道，为了OS的安全性等的考虑，进程是无法直接操作I/O设备的，其必须通过系统调用请求内核来协助完成I/O动作，
+
+而内核会为每个I/O设备维护一个buffer。
+
+如下图所示：
+
+![Image text](img/1589181887.jpg)
+
+整个请求过程为： 用户进程发起请求，内核接受到请求后，从I/O设备中获取数据到buffer中，再将buffer中的数据copy到用户进程的地址空间，
+
+该用户进程获取到数据后再响应客户端。在整个请求过程中，数据输入至buffer需要时间，而从buffer复制数据至进程也需要时间。
+
+因此根据在这两段时间内等待方式的不同，I/O动作可以分为以下五种模式：
+
+* 阻塞I/O (Blocking I/O)
+
+* 非阻塞I/O (Non-Blocking I/O)
+
+* I/O复用（I/O Multiplexing)
+
+* 信号驱动的I/O (Signal Driven I/O)
+
+* 异步I/O (Asynchrnous I/O) 
+
+### 记住这两点很重要
+
+* 1 等待数据准备 (Waiting for the data to be ready)
+* 2 将数据从内核拷贝到进程中 (Copying the data from the kernel to the process)
+
+### 阻塞I/O (Blocking I/O)
+
+在linux中，默认情况下所有的socket都是blocking，一个典型的读操作流程大概是这样：
+
+![Image text](img/1589182066.jpg)
+
+当用户进程调用了recvfrom这个系统调用，
+
+* 内核就开始了IO的第一个阶段：等待数据准备。对于network io来说，
+
+  很多时候数据在一开始还没有到达（比如，还没有收到一个完整的UDP包），这个时候内核就要等待足够的数据到来。
+
+  而在用户进程这边，整个进程会被阻塞。
+
+* 当内核一直等到数据准备好了，它就会将数据从内核中拷贝到用户内存，
+
+  然后内核返回结果，用户进程才解除block的状态，重新运行起来。
+
+**所以，blocking IO的特点就是在IO执行的两个阶段都被block了。**
 
 
 
