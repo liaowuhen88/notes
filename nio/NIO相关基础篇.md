@@ -141,7 +141,7 @@ select/epoll的好处就在于单个process就可以同时处理多个网络连�
 
 但是，如上图所示，整个用户的process其实是一直被block的。只不过process是被select这个函数block，而不是被socket IO给block。
 
-### 文件描述符fd
+#### 文件描述符fd
 
 Linux的内核将所有外部设备都可以看做一个文件来操作。那么我们对与外部设备的操作都可以看做对文件进行操作。
 
@@ -151,7 +151,7 @@ Linux的内核将所有外部设备都可以看做一个文件来操作。那么
 
 指向内核中一个结构体（文件路径，数据区，等一些属性）。那么我们的应用程序对文件的读写就通过对描述符的读写完成。
 
-### select
+#### select
 
 基本原理：select 函数监视的文件描述符分3类，分别是writefds、readfds、和exceptfds。调用后select函数会阻塞，
 
