@@ -39,7 +39,7 @@ class HelloThread extends Thread {
             n++;
             System.out.println(n + " hello!");
             try {
-                Thread.sleep(100);
+                Thread.sleep(40);
             } catch (InterruptedException e) {
                 break;
             }
