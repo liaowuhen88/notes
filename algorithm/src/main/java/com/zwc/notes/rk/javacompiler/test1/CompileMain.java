@@ -1,4 +1,4 @@
-package com.zwc.notes.rk.javacompiler;
+package com.zwc.notes.rk.javacompiler.test1;
 
 
 //CompileMain.java
@@ -26,10 +26,10 @@ public class CompileMain {
 
     public static void main(String[] args) throws IOException {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        int result = compiler.run(null, null, null, "D:\\java\\notes\\algorithm\\src\\main\\java\\com\\zwc\\notes\\rk\\javacompiler\\Test.java");
+        int result = compiler.run(null, null, null, "D:\\java\\notes\\algorithm\\src\\main\\java\\com\\zwc\\notes\\rk\\javacompiler\\com.zwc.notes.rk.javacompiler.test1.Test.java");
         System.out.println(result == 0 ? "编译成功" : "编译失败");
 
-        Process process = Runtime.getRuntime().exec("java Test", null, new File("D:\\java\\notes\\algorithm\\src\\main\\java\\com\\zwc\\notes\\rk\\javacompiler\\"));
+        Process process = Runtime.getRuntime().exec("java com.zwc.notes.rk.javacompiler.test1.Test", null, new File("D:\\java\\notes\\algorithm\\src\\main\\java\\com\\zwc\\notes\\rk\\javacompiler\\"));
 
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"));
         String str;
