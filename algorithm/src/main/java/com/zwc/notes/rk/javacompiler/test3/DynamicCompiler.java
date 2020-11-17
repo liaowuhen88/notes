@@ -38,7 +38,7 @@ public class DynamicCompiler {
      */
     public Class compileAndLoad(String fullName, String sourceCode) throws ClassNotFoundException {
         JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
-        List<JavaFileObject> javaFileObjectList = new ArrayList<JavaFileObject>();
+        List<JavaFileObject> javaFileObjectList = new ArrayList<>();
         javaFileObjectList.add(new CharSequenceJavaFileObject(fullName, sourceCode));
         boolean result = javaCompiler.getTask(null, fileManager, null, null, null, javaFileObjectList).call();
         if (result) {
