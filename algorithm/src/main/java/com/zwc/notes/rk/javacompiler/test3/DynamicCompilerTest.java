@@ -20,6 +20,7 @@ public class DynamicCompilerTest {
         DynamicCompiler compiler = new DynamicCompiler();
         Class clz = compiler.compileAndLoad(fullName, src.toString());
 
+        System.out.println(clz.newInstance().getClass());
         System.out.println(clz.getConstructor().newInstance());
         compiler.closeFileManager();
     }
