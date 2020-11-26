@@ -3,7 +3,7 @@ package com.zwc.notes.rk.thread;
 /**
  *
  */
-public class Test1 {
+public class TestInterrupt {
     public static void main(String[] args) throws InterruptedException {
         Thread t = new MyThread();
         t.start();
