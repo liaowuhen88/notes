@@ -12,9 +12,22 @@ public class PigInThePython {
     static volatile List pigs = new ArrayList();
     static volatile int pigsEaten = 0;
 
+    public PigInThePython() {
+        super();
+    }
+
     public static void main(String[] args) throws InterruptedException {
         new PigEater().start();
         new PigDigester().start();
+
+        System.out.println("running".hashCode());
+        while (true) {
+            System.out.println("running");
+            List pigs = new ArrayList();
+            pigs.add(new byte[32 * 1024]);
+
+            takeANap(100);
+        }
     }
 
     static void takeANap(int ms) {
@@ -34,7 +47,8 @@ public class PigInThePython {
                 if (pigsEaten > ENOUGH_PIGS) {
                     return;
                 }
-                takeANap(100);
+                System.out.println("put");
+                takeANap(50);
             }
         }
     }
@@ -46,6 +60,7 @@ public class PigInThePython {
 
             while (true) {
                 takeANap(2000);
+                System.out.println("释放");
                 pigsEaten += pigs.size();
                 pigs = new ArrayList();
                 if (pigsEaten > ENOUGH_PIGS) {
