@@ -49,6 +49,8 @@ public class WebServer {
                     SocketChannel socketChannel = (SocketChannel) key.channel();
                     buffer.clear();
                     socketChannel.read(buffer);
+                    System.out.println("received : " + new String(buffer.array()));
+
                     buffer.flip();
                     socketChannel.write(buffer);
                 }

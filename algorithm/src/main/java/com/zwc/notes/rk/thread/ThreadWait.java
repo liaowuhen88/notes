@@ -7,17 +7,18 @@ public class ThreadWait {
     private static Thread[] threads = new Thread[10];
 
     public static void main(String[] args) throws InterruptedException {
+
+        System.out.println(-1 << (Integer.SIZE - 3));
         for (int i = 0; i < 10; i++) {
             threads[i] = new ThreadA(i);
         }
-
         synchronized (lock) {
             for (int i = 0; i < 10; i++) {
                 System.out.println(i + "start");
                 threads[i].start();
-                Thread.sleep(20);
-
+                Thread.sleep(2);
             }
+
         }
     }
 
@@ -27,7 +28,6 @@ public class ThreadWait {
         public ThreadA(int i) {
             this.i = i;
         }
-
         @Override
         public void run() {
             synchronized (lock) {
