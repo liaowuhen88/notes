@@ -5,10 +5,17 @@ import java.lang.reflect.Method;
 
 /**
  * @author zhangwenchao19
+ * @date 2021-03-03 20:04
  */
 public class PeopleInvocationHandler implements InvocationHandler {
+    /**
+     *
+     */
     private Object people;
 
+    /**
+     * @param people
+     */
     PeopleInvocationHandler(Object people) {
         this.people = people;
     }
