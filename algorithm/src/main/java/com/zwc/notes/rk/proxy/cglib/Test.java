@@ -13,4 +13,6 @@ public class Test {
         Chinese proxy = (Chinese) enhancer.create();
         proxy.sayHello();
     }
+
+
 }
